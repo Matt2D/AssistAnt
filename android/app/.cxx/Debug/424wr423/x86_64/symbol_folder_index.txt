@@ -1,0 +1,1 @@
+A:\AssistAnt\AssistAnt\android\app\build\intermediates\cxx\Debug\424wr423\obj\x86_64
