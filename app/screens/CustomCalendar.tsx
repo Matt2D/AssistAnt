@@ -14,12 +14,13 @@
 //   );
 // }
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
+import { useRouter } from 'expo-router';
 
 const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-const getDaysInMonth = (month : number, year : number) => {
+const getDaysInMonth = (month : number, year : number) => { 
   return new Date(year, month + 1, 0).getDate();
 };
 
@@ -28,7 +29,11 @@ const getFirstDayOfMonth = (month: number , year: number) => {
 };
 
 
-const CustomCalendar = () => {
+
+export default function CustomCalendar(){
+
+  const router = useRouter();
+
   const today = new Date();
  
   const [currentMonth, setCurrentMonth] = useState(today.getMonth());
@@ -49,9 +54,32 @@ const CustomCalendar = () => {
     dates.push(i);
   }
   
+  // Fill in calendar
   for (let j = 0; j <= (42-daysInMonth-firstDay-1)%7; j++) {
     dates.push(null);
   }
+  
+  // const dates = useMemo(() => {
+  //   const days = [];
+  //   const leadingEmpty = getFirstDayOfMonth(currentMonth, currentYear);
+  //   for (let i = 0; i < leadingEmpty; i++) days.push(null);
+  //   for (let i = 1; i <= getDaysInMonth(currentMonth, currentYear); i++) days.push(i);
+  //   for (let j = 0; j <= (42-daysInMonth-firstDay-1)%7; j++) dates.push(null);
+  //   return days;
+  // }, [currentMonth, currentYear]);
+
+  const handleDayPress = (day : number) => {
+    if (day) {
+      const selectedDate = new Date(currentYear, currentMonth, day);
+      // const selectedDate = new Date(currentYear, currentMonth, day).toISOString().split('T')[0]; ;
+      router.push({
+                    pathname: '/[date]',
+                    params: { date: encodeURIComponent(selectedDate.toISOString()) },
+                    // params: { date: selectedDate }, // formatted like '2025-06-10'
+                  });
+    }
+  };
+
 
   const handlePrev = () => {
     if (currentMonth === 0) {
@@ -97,21 +125,31 @@ const CustomCalendar = () => {
         data={dates}
         numColumns={7}
         keyExtractor={(_, index) => index.toString()}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={[
-              styles.dateCell,
-              item === selectedDate ? styles.selected : null
-            ]}
-            onPress={() => item && setSelectedDate(item)}
-          >
-            <Text style={styles.dateText}>{item || ''}</Text>
-          </TouchableOpacity>
-        )}
+        renderItem={({item}) => {
+          if (item === null) {
+            return <View style={styles.dateCell} />;
+          }
+          return(
+            <TouchableOpacity
+              // style={[styles.dateCell]}
+              style={[
+                styles.dateCell,
+                item === selectedDate ? styles.selected : null
+              ]}
+              // onPress={() => item}
+              onPress={() => {
+                handleDayPress(item);
+                setSelectedDate(item) }
+              }
+                >
+              <Text style={styles.dateText}>{item || ''}</Text>
+            </TouchableOpacity>
+          )
+        }}
       />
     </View>
   );
-};
+}
 
 
 const styles = StyleSheet.create({
@@ -150,9 +188,12 @@ const styles = StyleSheet.create({
   selected: {
     backgroundColor: '#2196F3',
   },
+  not_selected: {
+    backgroundColor: '#000000',
+  },
   dateText: {
     fontSize: 14,
   },
 });
 
-export default CustomCalendar;
+
