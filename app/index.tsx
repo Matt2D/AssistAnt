@@ -1,14 +1,48 @@
 import React from 'react';
-import { SafeAreaView, StyleSheet } from 'react-native';
+import { Button, SafeAreaView, StyleSheet } from 'react-native';
 import CustomCalendar from './screens/CustomCalendar'; // adjust path if needed
+import LoginScreen from './screens/LoginScreen';
+import { useEffect,  useState } from 'react';
+import { useAuthStore } from './stores/useAuthStore';
 
-export default function Index() {
-  return (
-    <SafeAreaView style={styles.container}>
-      <CustomCalendar />
-    </SafeAreaView>
-  );
-};
+export default function App() {
+  const checkLogin = useAuthStore((s) => s.checkLogin);
+  const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
+  const [loaded, setLoaded] = useState(false);
+  const logout = useAuthStore((s) => s.logout);
+  console.log("Got to start")
+  useEffect(() => {
+    (async () => {
+      await checkLogin();
+      setLoaded(true);
+    })();
+  }, []);
+
+  if (!loaded) return <Button title="Logout" onPress={logout} />; // Or show splash screen
+
+  if (isLoggedIn){
+    
+    return (
+      <SafeAreaView style={styles.container}>
+        <Button title="Logout" onPress={logout} />
+        <CustomCalendar />
+      </SafeAreaView>
+    ); 
+  }
+  else{ 
+    return(
+      <LoginScreen />
+    );
+  }
+}
+
+// export default function Index() {
+//   return (
+//     <SafeAreaView style={styles.container}>
+//       <CustomCalendar />
+//     </SafeAreaView>
+//   );
+// };
 
 const styles = StyleSheet.create({
   container: {

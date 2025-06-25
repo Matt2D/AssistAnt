@@ -18,6 +18,7 @@ export default function AddEvent() {
     const [start_time, setStartTime] = useState('');
     const [end_time, setEndTime] = useState('');
     const [description, setDesc] = useState('');
+    const [location, setLoc] = useState('');
     const handleAdd = () => { 
     const id = uuid.v4()
 
@@ -28,6 +29,7 @@ export default function AddEvent() {
       end_time,
       description,
       date: date as string,
+      location
     });
     router.back();
   };
@@ -58,6 +60,13 @@ export default function AddEvent() {
         placeholder="Description"
         value={description}
         onChangeText={setDesc}
+      />
+
+      <TextInput
+        style={styles.input}
+        placeholder="Location"
+        value={location}
+        onChangeText={setLoc}
       />
       <Button title="Save Event" onPress={handleAdd} />
     </View>

@@ -8,6 +8,7 @@ export default function EditEventScreen() {
   const router = useRouter();
   const { id, title, date, time, description } = useLocalSearchParams();
   const editEvent = useEventStore((s) => s.editEvent);
+  const deleteEvent = useEventStore((s) => s.deleteEvent);
   const event = useEventStore((s) => {
     return s.getEventById(id as string)
   })
@@ -16,6 +17,7 @@ export default function EditEventScreen() {
     const [newStartTime, setStartTime] = useState('');
     const [newEndTime, setEndTime] = useState('');
     const [newDesc, setDesc] = useState('');
+    const [newLoc, setLoc] = useState('');
 
     useEffect(() => {
         if (event) {
@@ -23,6 +25,7 @@ export default function EditEventScreen() {
         setStartTime(event.start_time || '');
         setEndTime(event.end_time || '');
         setDesc(event.description || '');
+        setLoc(event.location || '');
         }
     }, [event]);
   
@@ -35,7 +38,14 @@ export default function EditEventScreen() {
       end_time: newEndTime,
       description: newDesc as string,
       date: date as string,
+      location: newLoc
     });
+    router.back(); // Go back after saving
+  };
+  const onDelete = () => {
+    if (event){
+      deleteEvent(event);
+    }
     router.back(); // Go back after saving
   };
 
@@ -64,7 +74,15 @@ export default function EditEventScreen() {
       value={newDesc}
       onChangeText={setDesc}
     />
+
+    <TextInput
+      style={styles.input}
+      placeholder="Location"
+      value={newLoc}
+      onChangeText={setLoc}
+    />
     <Button title="Save Changes" onPress={onSave} />
+    <Button title="Delete Event" onPress={onDelete} />
   </View>
   );
 }
