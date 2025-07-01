@@ -4,7 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { User } from '../Users/userAccount';
 
 export type Event = {
-    // user: User;
+    user: User;
     id: string;
     title: string;
     start_time: string;
@@ -17,10 +17,10 @@ export type Event = {
 type Store = {
     events: Record<string, Event[]>; // key = date string
     addEvent: (event: Event) => void;
-    getEventsByDate: (date: string) => Event[];
+    getEventsByDate: (user: string, date: string) => Event[];
     deleteEvent: (event: Event) => Boolean;
     editEvent: (updatedEvent: Event) => void;
-    getEventById:  (id: string) => Event | undefined;
+    getEventById:  (user: string, id: string) => Event | undefined;
 };
 
 export const useEventStore = create<Store>()(
@@ -59,17 +59,25 @@ export const useEventStore = create<Store>()(
         return true;
     },
     
-    getEventById: (id)=> {
+    getEventById: (user, id)=> {
         const events = get().events;
         for (const day in events) {
             const found = events[day].find((e) => e.id === id);
-            if (found) return found;
+            
+            if (found) {
+              if (user === found.user.username){
+                return found;
+              }
+            }
         }
         return undefined;
     },
 
-    getEventsByDate: (date) => {
-        return get().events[date] || [];
+    getEventsByDate: (user, date) => {
+        // return get().events[date] || [];
+        const events = get().events[date] || [];
+        const updatedList = events.filter((e) => e.user?.username === user);
+        return updatedList;
       },
     }),
     

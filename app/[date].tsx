@@ -1,9 +1,10 @@
-import React from 'react';
 import { useRouter, useLocalSearchParams, RouteParams } from 'expo-router';
 import DayViewScreen from './screens/DayViewScreen'; // adjust path if needed
 import { View, Text, FlatList, Button, StyleSheet } from 'react-native';
 import { useEventStore, Event } from './stores/eventStores';
-
+import { useAuthStore } from './stores/useAuthStore';
+import React, { useState, useEffect} from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function DayViewRoute() {
   const { date } = useLocalSearchParams<{ date: string }>();
@@ -11,10 +12,23 @@ export default function DayViewRoute() {
   // const events = useEventStore((s) => s.getEventsByDate(date as string));
   // const getEventsByDate = useEventStore((s) => s.getEventsByDate);
   // const events = getEventsByDate(date as string);
-  const events = useEventStore((s) =>
-    s.events[date as string]
+  const user = useAuthStore((s) => s.user);
+  // const events = useEventStore((s) => s.getEventsByDate(user?.username ?? '', date.toISOString()));
+  // const events = useEventStore((s) =>
+  //   s.getEventsByDate(user?.username ?? '', date)
+  // );
+  
+  const getEventsByDate = useEventStore((s) => s.getEventsByDate);
+  const [events, setEvents] = useState<Event[]>([]);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      if (user?.username && date) {
+        const result = getEventsByDate(user.username, date);
+        setEvents(result);
+      }
+    }, [user?.username, date])
   );
- 
   
   const handleEventClick = (event: Event) => {
     router.push({
@@ -56,7 +70,7 @@ export default function DayViewRoute() {
         onPress={() =>
           router.push({
             pathname: '/addEvent',
-            params: { date: date as string },
+            params: { date: date as string},
           })
         }
       />

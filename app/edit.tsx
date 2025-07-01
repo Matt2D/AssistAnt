@@ -3,14 +3,17 @@ import { useEventStore, Event} from './stores/eventStores'; // adjust import
 import { View, TextInput, Button, StyleSheet } from 'react-native';
 import { useEffect} from 'react';
 import React, { useState } from 'react';
+import { useAuthStore } from './stores/useAuthStore';
 
 export default function EditEventScreen() {
   const router = useRouter();
   const { id, title, date, time, description } = useLocalSearchParams();
   const editEvent = useEventStore((s) => s.editEvent);
   const deleteEvent = useEventStore((s) => s.deleteEvent);
+  const user = useAuthStore((s) => s.user);
+  if (!user) return false;
   const event = useEventStore((s) => {
-    return s.getEventById(id as string)
+    return s.getEventById(user?.username ?? '', id as string)
   })
 
     const [newTitle, setTitle] = useState('');
@@ -32,6 +35,7 @@ export default function EditEventScreen() {
 
   const onSave = () => {
     editEvent({
+      user,
       id: id as string,
       title: newTitle,
       start_time: newStartTime,

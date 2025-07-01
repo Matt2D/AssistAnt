@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, TextInput, Button, Text } from 'react-native';
-import { useAuthStore } from '../stores/useAuthStore';
+import { useAuthStore, hashPassword } from '../stores/useAuthStore';
 import uuid from 'react-native-uuid';
 
 export default function RegisterScreen() {
@@ -10,8 +10,14 @@ export default function RegisterScreen() {
 
   const handleRegister = async () => {
     const id = uuid.v4()
-    const success = await register({ username, password, id});
-    alert(success ? 'Registered!' : 'Username taken');
+    try {
+      const hash = await hashPassword(password); // calls resolve()
+      const success = await register({ username, password: hash, id});
+      alert(success ? 'Registered!' : 'Username taken');
+    } catch (err) {
+      console.error("Failed to hash password:", err); // if reject() was called
+    }
+    
   };
 
   return (

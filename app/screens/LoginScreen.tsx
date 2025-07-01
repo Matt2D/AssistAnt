@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { View, TextInput, Button, Text } from 'react-native';
-import { useAuthStore } from '../stores/useAuthStore';
+import { useAuthStore, hashPassword  } from '../stores/useAuthStore';
 import RegisterScreen from "./RegisterScreen";
 import { useLocalSearchParams, useRouter } from 'expo-router';
 
+
 export default function LoginScreen() {
-  console.log("LOGGIN SCREEN")
   const login = useAuthStore((s) => s.login);
   const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
   const logout = useAuthStore((s) => s.logout);
@@ -16,8 +16,8 @@ export default function LoginScreen() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   
-  console.log("about to handle login")
   const handleLogin = async () => {
+    setPassword(await hashPassword(password));
     const success = await login(username, password);
     if (!success) alert('Invalid credentials!');
   };

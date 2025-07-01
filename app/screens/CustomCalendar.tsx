@@ -17,6 +17,13 @@
 import React, { useState, useMemo } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useEventStore } from '../stores/eventStores';
+import { useAuthStore } from '../stores/useAuthStore';
+
+// const date = new Date();
+ 
+// const user = useAuthStore((s) => s.user);
+// const events = useEventStore((s) => s.getEventsByDate(user?.username ?? '', date.toISOString()));
 
 const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
