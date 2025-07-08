@@ -4,12 +4,15 @@ import CustomCalendar from './screens/CustomCalendar'; // adjust path if needed
 import LoginScreen from './screens/LoginScreen';
 import { useEffect,  useState } from 'react';
 import { useAuthStore } from './stores/useAuthStore';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 
 export default function App() {
   const checkLogin = useAuthStore((s) => s.checkLogin);
   const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
   const [loaded, setLoaded] = useState(false);
   const logout = useAuthStore((s) => s.logout);
+  const router = useRouter();
+
   console.log("Got to start")
   useEffect(() => {
     (async () => {
@@ -25,6 +28,8 @@ export default function App() {
     return (
       <SafeAreaView style={styles.container}>
         <Button title="Logout" onPress={logout} />
+        <Button title="Go to User Page" onPress={() => router.push('/user')} />
+        <Button title="See Users" onPress={() => router.push('/users')} />
         <CustomCalendar />
       </SafeAreaView>
     ); 

@@ -1,0 +1,14 @@
+import React from 'react';
+import { Button, SafeAreaView, StyleSheet } from 'react-native';
+import CustomCalendar from './screens/CustomCalendar'; // adjust path if needed
+import LoginScreen from './screens/LoginScreen';
+import { useEffect,  useState } from 'react';
+import { useAuthStore } from './stores/useAuthStore';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import 
+
+export default function Login() {
+ return(
+    
+ )
+}
