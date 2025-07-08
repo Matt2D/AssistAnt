@@ -7,14 +7,13 @@ import UsersListScreen from './screens/MultipleUsersScreen';
 import { getCurrentUserProfile, User } from './Users/userAccount';
 import { useFocusEffect } from '@react-navigation/native';
 export default function UserPage() {
-//   const user = useAuthStore((s) => s.user);
+  const user = useAuthStore((s) => s.userFull);
   const logout = useAuthStore((s) => s.logout);
   const router = useRouter();
   const [email, setEmail] = useState('');
-  const [emailDraft, setDraftEmail] = useState('');
   const updateEmail = useAuthStore((s) => s.updateUserEmail);
   const getUser = useAuthStore((s) => s.getUser)
-  const [user, setUser] = useState<User | null>(null);
+  // const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
 
@@ -22,35 +21,16 @@ export default function UserPage() {
     (async () => {
       const profile = await getUser();
       console.log(profile)
-    //   setEmail(profile?.email ?? "---");
-    //   console.log(email)
-      setUser(profile);
-
-      console.log(user)
       setLoading(false);
     })();
   }, [user?.email]);
 
-//   useFocusEffect(
-//       React.useCallback(() => {
-//       (async () => {
-//           const profile = await getUser();
-//           setUser(profile);
-//           setLoading(false);
-//       })
-//       }, [user, email])
-//   );
-
-
-
   if (loading) return null;
-
-
 
   const handleSave = async () => {
     // setEmail(emailDraft);
     if (user?.username && email) {
-      user.email = email;
+      // user.email = email;
       console.log(user);
       await updateEmail(user.username, email);
       alert('Email updated!');

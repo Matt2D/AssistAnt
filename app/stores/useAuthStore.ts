@@ -9,6 +9,7 @@ import { EasingNameSymbol } from 'react-native-reanimated/lib/typescript/Easing'
 type AuthState = {
   user: User | null;
   isLoggedIn: boolean;
+  userFull: User | null;
   login: (username: string, password: string) => Promise<boolean>;
   register: (user: PasswordUser) => Promise<boolean>;
   logout: () => Promise<void>;
@@ -49,6 +50,7 @@ export function comparePassword(password: string, hash: string): Promise<boolean
 
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
+  userFull: null,
   isLoggedIn: false,
 
   getUser: async () => {
@@ -65,6 +67,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
     // 3. Find & return the matching record
     const fullUser = allUsers.find((u) => u.username === username);
+    set({ userFull: fullUser });
     return fullUser || null;
   },
 
@@ -97,6 +100,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         const updatedUser = { ...currentUser, email };
         await SecureStore.setItemAsync('user', JSON.stringify(updatedUser));
         set({ user: updatedUser });
+        set({ userFull: updatedUser });
       }
     }
   },
