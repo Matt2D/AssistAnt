@@ -2,7 +2,7 @@
 import { View, Text, Button, StyleSheet } from 'react-native';
 import { useAuthStore } from './stores/useAuthStore';
 import { useRouter } from 'expo-router';
-import UsersListScreen from './screens/MultipleUsersScreen';
+import UsersListScreen from './screens/UsersListScreen';
 
 export default function UserPage() {
   const user = useAuthStore((s) => s.user);

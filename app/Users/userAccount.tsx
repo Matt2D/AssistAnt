@@ -6,7 +6,7 @@ export type PasswordUser = {
   id: string;
   password: string;
   email?: string;
-  phone_number?: string;
+  phoneNumber?: string;
   friends?: Friend[] | [];
 };
 
@@ -23,7 +23,7 @@ export async function getCurrentUserProfile(): Promise<User | null> {
   const sessionRaw = await SecureStore.getItemAsync('user');
   if (!sessionRaw) return null;
 
-  const session = JSON.parse(sessionRaw) as { username: string; id: string; email?: string };
+  const session = JSON.parse(sessionRaw) as { username: string; id: string; email?: string, phone_number?: string };
   const { username } = session;
 
   // 2. Load the list of all registered users

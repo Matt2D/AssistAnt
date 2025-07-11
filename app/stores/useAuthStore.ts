@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import * as SecureStore from 'expo-secure-store';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { PasswordUser, User } from '../Users/userAccount';
+import { Friend, PasswordUser, User } from '../Users/userAccount';
 import bcrypt from 'react-native-bcrypt';
 import { persist } from 'zustand/middleware';
 import { EasingNameSymbol } from 'react-native-reanimated/lib/typescript/Easing';
@@ -10,13 +10,16 @@ type AuthState = {
   user: User | null;
   isLoggedIn: boolean;
   userFull: User | null;
+  friendList: Friend[] | null;
   login: (username: string, password: string) => Promise<boolean>;
   register: (user: PasswordUser) => Promise<boolean>;
   logout: () => Promise<void>;
   checkLogin: () => Promise<void>;
   deleteUser: (user: string) => Promise<void>;
   updateUserEmail:(username: string, email: string) => Promise<void>;
+  updateUserPhoneNumber:(username: string, phoneNumber: string) => Promise<void>;
   getUser:() => Promise<User | null>;
+  getFriendList:() => Promise<Friend[] | null>;
 };
 
 export function hashPassword(password: string): Promise<string> {
@@ -34,7 +37,6 @@ export function hashPassword(password: string): Promise<string> {
 }
 
 export function comparePassword(password: string, hash: string): Promise<boolean> {
-  console.log("Hi")
   console.log(password)
   console.log(hash)
   return new Promise((resolve, reject) => {
@@ -52,13 +54,14 @@ export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   userFull: null,
   isLoggedIn: false,
+  friendList: null,
 
   getUser: async () => {
     // 1. Read the session info
     const sessionRaw = await SecureStore.getItemAsync('user');
     if (!sessionRaw) return null;
 
-    const session = JSON.parse(sessionRaw) as { username: string; id: string; email?: string };
+    const session = JSON.parse(sessionRaw) as { username: string; id: string; email?: string, phone?: string, friendList: Friend[]};
     const { username } = session;
 
     // 2. Load the list of all registered users
@@ -69,6 +72,24 @@ export const useAuthStore = create<AuthState>((set) => ({
     const fullUser = allUsers.find((u) => u.username === username);
     set({ userFull: fullUser });
     return fullUser || null;
+  },
+
+  getFriendList: async () => {
+    // 1. Read the session info
+    const sessionRaw = await SecureStore.getItemAsync('user');
+    if (!sessionRaw) return null;
+
+    const session = JSON.parse(sessionRaw) as { username: string; id: string; email?: string, phone?: string, friendList: Friend[]};
+    const { username } = session;
+
+    // 2. Load the list of all registered users
+    const raw = await AsyncStorage.getItem('registeredUsers');
+    const allUsers: User[] = raw ? JSON.parse(raw) : [];
+
+    // 3. Find & return the matching record
+    const fullUser = allUsers.find((u) => u.username === username);
+    set({ friendList: fullUser?.friends });
+    return fullUser?.friends || null;
   },
 
   register: async (newUser) => {
@@ -99,7 +120,29 @@ export const useAuthStore = create<AuthState>((set) => ({
       if (currentUser.username === username) {
         const updatedUser = { ...currentUser, email };
         await SecureStore.setItemAsync('user', JSON.stringify(updatedUser));
-        set({ user: updatedUser });
+        // set({ user: updatedUser });
+        set({ userFull: updatedUser });
+      }
+    }
+  },
+   updateUserPhoneNumber: async (username: string, phoneNumber: string) => {
+      const raw = await AsyncStorage.getItem('registeredUsers');
+    const users: PasswordUser[] = raw ? JSON.parse(raw) : [];
+
+    const updatedUsers = users.map((user) =>
+      user.username === username ? { ...user, phoneNumber } : user
+    );
+
+    await AsyncStorage.setItem('registeredUsers', JSON.stringify(updatedUsers));
+
+    // If it's the current user, update that too
+    const storedUser = await SecureStore.getItemAsync('user');
+    if (storedUser) {
+      const currentUser = JSON.parse(storedUser);
+      if (currentUser.username === username) {
+        const updatedUser = { ...currentUser, phoneNumber };
+        await SecureStore.setItemAsync('user', JSON.stringify(updatedUser));
+        // set({ user: updatedUser });
         set({ userFull: updatedUser });
       }
     }

@@ -30,6 +30,7 @@ export default function App() {
         <Button title="Logout" onPress={logout} />
         <Button title="Go to User Page" onPress={() => router.push('/user')} />
         <Button title="See Users" onPress={() => router.push('/users')} />
+        <Button title="Friends" onPress={() => router.push('/friends')} />
         <CustomCalendar />
       </SafeAreaView>
     ); 
@@ -52,6 +53,12 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    // alignItems: 'flex-start',
+    // justifyContent: 'center',
+  },
+  button: {
+    flex: 1,
+    padding: 8
     // alignItems: 'flex-start',
     // justifyContent: 'center',
   },
